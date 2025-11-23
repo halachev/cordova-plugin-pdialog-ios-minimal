@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
+        id="cordova-plugin-pdialog-ios-minimal"
+        version="1.0.0">
+
+    <name>PDialog iOS Minimal</name>
+
+    <platform name="ios">
+        <header-file src="src/ios/PDialog.h" />
+        <source-file src="src/ios/PDialog.m" />
+    </platform>
+
+    <js-module src="www/pdialog.js" name="PDialog">
+        <clobbers target="cordova.plugins.pDialog" />
+    </js-module>
+
+</plugin>
