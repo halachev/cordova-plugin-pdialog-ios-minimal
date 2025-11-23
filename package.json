@@ -1,7 +1,7 @@
 {
   "name": "cordova-plugin-pdialog-ios-minimal",
   "version": "1.0.0",
-  "description": "Minimal iOS spinner plugin for Cordova - just a simple UIActivityIndicatorView spinner",
+  "description": "Cordova plugin for minimal iOS spinner (UIActivityIndicatorView)",
   "cordova": {
     "id": "cordova-plugin-pdialog-ios-minimal",
     "platforms": [
@@ -15,10 +15,7 @@
     "spinner",
     "progressdialog"
   ],
-  "author": "Nurietin Mehmedov",
+  "author": "softmex",
   "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/halachev/cordova-plugin-pdialog-ios-minimal.git"
-  }
+  "dependencies": {}
 }
