@@ -1,8 +1,7 @@
 #import "PDialog.h"
 
 @interface PDialog ()
-@property (nonatomic, strong) UIView *backgroundView;
-@property (nonatomic, strong) UIVisualEffectView *blurView;
+@property (nonatomic, strong) UIView *spinnerContainer;
 @property (nonatomic, strong) CAShapeLayer *circularSpinner;
 @end
 
@@ -10,34 +9,28 @@
 
 - (void)init:(CDVInvokedUrlCommand*)command {
     dispatch_async(dispatch_get_main_queue(), ^{
+        UIView *rootView = self.viewController.view;
+
         // Премахваме стария spinner
-        if (self.circularSpinner != nil) {
-            [self.circularSpinner removeFromSuperlayer];
-            [self.blurView removeFromSuperview];
-            [self.backgroundView removeFromSuperview];
+        if (self.spinnerContainer != nil) {
+            [self.spinnerContainer removeFromSuperview];
+            self.spinnerContainer = nil;
             self.circularSpinner = nil;
         }
 
-        UIView *rootView = self.viewController.view;
+        // Контейнер за spinner (кръгъл, тъмен и леко прозрачен)
+        CGFloat containerSize = 80.0;
+        UIView *container = [[UIView alloc] initWithFrame:CGRectMake(0, 0, containerSize, containerSize)];
+        container.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.6]; // тъмен и прозрачен фон
+        container.layer.cornerRadius = containerSize / 2.0;
+        container.clipsToBounds = YES;
+        container.center = rootView.center;
 
-        // Background view
-        self.backgroundView = [[UIView alloc] initWithFrame:rootView.bounds];
-        self.backgroundView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+        [rootView addSubview:container];
+        self.spinnerContainer = container;
 
-        // Винаги тъмен blur
-        UIBlurEffect *blurEffect = [UIBlurEffect effectWithStyle:UIBlurEffectStyleDark];
-        self.blurView = [[UIVisualEffectView alloc] initWithEffect:blurEffect];
-        self.blurView.frame = self.backgroundView.bounds;
-        self.blurView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-
-        // Много прозрачен overlay
-        self.blurView.backgroundColor = [[UIColor colorWithWhite:0.0 alpha:0.05] colorWithAlphaComponent:0.05];
-
-        [self.backgroundView addSubview:self.blurView];
-        [rootView addSubview:self.backgroundView];
-
-        // Circular spinner (винаги бял)
-        CGFloat spinnerSize = 50.0;
+        // Circular spinner (бял)
+        CGFloat spinnerSize = 40.0;
         CAShapeLayer *circleLayer = [CAShapeLayer layer];
         circleLayer.strokeColor = [UIColor whiteColor].CGColor;
         circleLayer.fillColor = UIColor.clearColor.CGColor;
@@ -52,9 +45,9 @@
                                                          clockwise:YES];
         circleLayer.path = path.CGPath;
 
-        // Positioning
-        circleLayer.frame = CGRectMake((rootView.bounds.size.width - spinnerSize)/2.0,
-                                       (rootView.bounds.size.height - spinnerSize)/2.0,
+        // Позициониране на spinner в центъра на контейнера
+        circleLayer.frame = CGRectMake((containerSize - spinnerSize)/2.0,
+                                       (containerSize - spinnerSize)/2.0,
                                        spinnerSize, spinnerSize);
 
         // Rotation animation
@@ -64,7 +57,7 @@
         rotation.repeatCount = INFINITY;
         [circleLayer addAnimation:rotation forKey:@"rotationAnimation"];
 
-        [self.backgroundView.layer addSublayer:circleLayer];
+        [container.layer addSublayer:circleLayer];
         self.circularSpinner = circleLayer;
 
         // Callback към JS
@@ -75,10 +68,9 @@
 
 - (void)dismiss:(CDVInvokedUrlCommand*)command {
     dispatch_async(dispatch_get_main_queue(), ^{
-        if (self.circularSpinner != nil) {
-            [self.circularSpinner removeFromSuperlayer];
-            [self.blurView removeFromSuperview];
-            [self.backgroundView removeFromSuperview];
+        if (self.spinnerContainer != nil) {
+            [self.spinnerContainer removeFromSuperview];
+            self.spinnerContainer = nil;
             self.circularSpinner = nil;
         }
 
